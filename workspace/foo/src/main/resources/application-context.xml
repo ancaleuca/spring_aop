@@ -7,17 +7,12 @@
 	http://www.springframework.org/schema/aop 
 	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd ">
 
+<aop:aspectj-autoproxy />
+
   <bean id="foo"
     class="com.example.Foo" />
 	
   <bean id="logging"
     class="com.example.LogMe" />
-    
-  <aop:config>
-    <aop:aspect ref="logging">
-      <aop:before pointcut="execution(* com.example.Foo.doSomething(..))"
-       method="logBefore" />
-    </aop:aspect>
-  </aop:config>
   
 </beans>
