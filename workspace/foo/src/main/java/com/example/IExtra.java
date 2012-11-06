@@ -1,7 +1,5 @@
 package com.example;
 
-public interface Extra {
-	
+public interface IExtra {
 	void doSomethingExtra();
-
 }

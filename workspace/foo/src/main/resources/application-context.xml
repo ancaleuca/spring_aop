@@ -14,5 +14,14 @@
 	
   <bean id="logging"
     class="com.example.Logger" />
-  
+    
+<aop:config>    
+  <aop:aspect>
+    <aop:declare-parents
+      types-matching="com.example.Foo+"
+      implement-interface="com.example.IExtra"
+      default-impl="com.example.ExtraFoo" 
+    />
+  </aop:aspect>
+</aop:config>
 </beans>

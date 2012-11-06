@@ -46,50 +46,8 @@
         <h3>Introduction</h3>
        <ul>
          <li>AOP is used for separating common logic (<i>cross-cutting concerns</i>) from rest of business logic. Examples: logging, security
-         <li>Three AOP frameworks: AspectJ, JBoss AOP and <b>Spring AOP</b>
-      </article>
-     
-      <article class="smaller">
-          <h3>
-            Simple example - Annotations
-         </h3>
-<pre>
-  public class Foo {
-
-        public void doSomething() {
-                System.out.println("Foo is doing something");
-        }
-  }
-
-  @Aspect
-  public class Logger {
-
-        @Pointcut("execution(* com.example.Foo.doSomething(..))")
-        public void something() {
-                //Dummy method!
-        }
-
-        @Before("something()") //could also use @After, etc.
-        public void logBefore() {
-                System.out.println("Logger is logging before");
-        }
-  }
-
-&lt;aop:aspectj-autoproxy /&gt;
-
-&lt;bean id=&quot;foo&quot;
-    class=&quot;com.example.Foo&quot; /&gt;
-
-&lt;bean id=&quot;logging&quot;
-    class=&quot;com.example.Logger&quot; /&gt;
-
-</pre>
-        </article>
-
-       <article>
-        <h3>
-          AOP terminology
-        </h3>
+         <li>Three AOP frameworks: AspectJ, JBoss AOP, <b>Spring AOP</b>
+	 <li>Terminology
             <ul>
               <li>
                <span class='blue'>Aspect</span>
@@ -100,10 +58,46 @@
               <li>
                <span class='blue'>Join points</span> - set of all possible pointcuts
               <li>
-               <span class='blue'>Weaving</span> - compile time (AspectJ), classload time (AspectJ 5 LTW), runtime (Spring).
+               <span class='blue'>Weaving</span> - <i>compile time</i> vs <i>classload time</i> vs <i>runtime</i>
               <li>
                <span class='blue'>Introduction</span>
           </ul>
+        </ul>
+      </article>
+     
+      <article class="smaller">
+          <h3>
+            Simple example - Annotations
+         </h3>
+<pre>
+  public class Foo implements IBasic {
+
+        public void doSomething() {
+                System.out.println("Foo is doing something");
+        }
+  }
+  @Aspect
+  public class Logger {
+
+        @Pointcut("execution(* com.example.Foo.doSomething(..))")
+        public void something() {
+                //Dummy method!
+        }
+
+        @Before("something()") //could also use @After, @Around etc.
+        public void logBefore() {
+                System.out.println("Logger is logging before");
+        }
+  }
+
+&lt;aop:aspectj-autoproxy /&gt;
+&lt;bean id=&quot;foo&quot; class=&quot;com.example.Foo&quot; /&gt;
+&lt;bean id=&quot;logging&quot; class=&quot;com.example.Logger&quot; /&gt;
+</pre>
+<pre>
+Logger is logging before
+Foo is doing something
+</pre>
         </article>
 
         <article class="smaller">
@@ -111,7 +105,7 @@
           Simple example - XML
          </h3>
 <pre>
-  public class Foo {
+  public class Foo implements IBasic {
 
       public void doSomething() {
           System.out.println("Foo is doing something");
@@ -145,8 +139,7 @@
          <h3>Spring AOP characteristics</h3>
          <ul>
            <li>Performs runtime weaving
-           <pre>
-
+<pre>
   public static void main(String[] args) {
       // When next line of code runs, the proxy class 
       // for weaving in the logging aspect is created as well.
@@ -155,7 +148,7 @@
       Foo foo = (Foo) applicationContext.getBean("foo");
       foo.doSomething();
   }
-           </pre>
+</pre>
            <li>Only supports method join points. AspectJ also supports constructor and field join points.
          </ul>  
       </article>
@@ -180,9 +173,144 @@
       </article>
 
       <article>
+        <h3>Around advice</h3>
+<pre>
+
+@Aspect
+  public class Logger {
+    @Pointcut("execution(* com.example.Foo.doSomething(..))")
+    public void something() {
+	//Dummy method!
+    }
+    @Around("something()")
+    public void logAround(ProceedingJoinPoint joinPoint) {
+        try{
+            System.out.println("Logger is logging around (before)");
+
+	    joinPoint.proceed();
+
+	    System.out.println("Logger is logging around (after)");
+	} catch (Throwable e) {
+            System.out.println("Logger is logging an exception");
+        }
+    }
+
+</pre>
+      </article>
+      <article class="smaller">
+         <h3>Result</h3>
+<pre>
+Logger is logging around (before)
+Foo is doing something
+Logger is logging around (after)
+</pre>
+<p><b>Peculiarities</b>: if call to <pre>joinPoint.proceed();</pre> </p>
+<ul>
+ <li> is missing:
+<pre>
+Logger is logging around (before)
+Logger is logging around (after)
+</pre>
+<li> is doubled:
+<pre>
+Logger is logging around (before)
+Foo is doing something
+Foo is doing something
+Logger is logging around (after)
+</pre>
+   </article>
+   <article>
+    <h3>Passing parameters to advice</h3>
+<pre>
+  public class Foo implements IBasic {
+      public void doSomethingWithParameter(String param) {
+          System.out.println("Foo is doing something with " + param);
+     }
+  }
+
+  @Aspect
+  public class Logger {
+     @Pointcut("execution(* com.example.Foo" +
+			".doSomethingWithParameter(String)) && args(parameter)")
+     public void somethingWithParam(String parameter) {
+         //Dummy method!
+     }
+	
+     @After("somethingWithParam(parameter)")
+     public void logAfterWithParam(String parameter) {
+	 System.out.println("Logger is logging this parameter: " 
+                             + parameter);
+     }
+  }
+</pre>
+  </article>
+
+  <article>
+  <h3>Passing parameters to advice (2)</h3>
+<pre>
+  public static void main(String[] args) {
+      ApplicationContext applicationContext = new ClassPathXmlApplicationContext("application-context.xml");
+      IBasic foo = (IBasic) applicationContext.getBean("foo");
+      foo.doSomethingWithParameter("MyParam");
+  }
+
+Foo is doing something with MyParam
+Logger is logging this parameter: MyParam
+</pre>
+  </article>
+      <article>
         <h3>
-          Spring AOP
+          AOP Introductions
         </h3>
+<pre>
+  public interface IBasic {
+     public void doSomething();
+ }
+
+  public class Foo implements IBasic{
+      public void doSomething() {
+          System.out.println("Foo is doing something");
+      }
+ }
+
+  public interface IExtra {
+      void doSomethingExtra();
+  }
+
+  public class ExtraFoo implements IExtra {
+    public void doSomethingExtra() {
+        System.out.println("ExtraFoo is doing something extra");
+    }
+ }
+</pre>
+  </article>
+
+  <article>
+   <h3>
+     AOP Introductions (2)
+   </h3>
+<pre>
+  public static void main(String[] args) {
+      ApplicationContext applicationContext = new ClassPathXmlApplicationContext("application-context.xml");
+      IBasic foo = (IBasic) applicationContext.getBean("foo");
+      IExtra extraFoo = (IExtra) foo;
+		
+      System.out.println("Is IBasic?: " + (foo instanceof IBasic));
+      System.out.println("Is IExtra?: " + (foo instanceof IExtra));
+      System.out.println("##### This is IBasic: ######");
+      foo.doSomething();
+      System.out.println("##### This is IExtra: ######");
+      extraFoo.doSomethingExtra();
+  }
+Console output:
+Is IBasic?: true
+Is IExtra?: true
+##### This is IBasic: ######
+Logger is logging before
+Foo is doing something
+##### This is IExtra: ######
+ExtraFoo is doing something extra
+</pre>
       </article>
 
     </section>
