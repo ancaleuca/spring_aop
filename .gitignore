@@ -1,0 +1,5 @@
+workspace/.metadata
+workspace/foo/.settings
+workspace/foo/.classpath
+workspace/foo/.project
+workspace/foo/target
