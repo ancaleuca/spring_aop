@@ -1,1 +1,191 @@
-Testing Github Page
+<!DOCTYPE html>
+
+<!--
+  Google HTML5 slide template
+
+  Authors: Luke Mahé (code)
+           Marcin Wichary (code and design)
+           
+           Dominic Mazzoni (browser compatibility)
+           Charles Chen (ChromeVox support)
+
+  URL: http://code.google.com/p/html5slides/
+-->
+
+<html>
+  <head>
+    <title>Spring AOP</title>
+    <meta charset='utf-8'>
+    <script
+      src='https://html5slides.googlecode.com/svn/trunk/slides.js'></script>
+  </head>
+  
+  <style>
+      .smaller {
+          font-size: 0.7em;
+      }
+    /* Your individual styles here, or just use inline styles if that’s
+       what you want. */
+    
+    
+  </style>
+
+  <body style='display: none'>
+
+    <section class='slides layout-regular'>
+      <article>
+        <h1>
+          Spring AOP
+        </h1>
+        <p>
+          Anca Leuca
+        </p>
+      </article>
+
+      <article>
+        <h3>Introduction</h3>
+       <ul>
+         <li>AOP is used for separating common logic (<i>cross-cutting concerns</i>) from rest of business logic. Examples: logging, security
+         <li>Three AOP frameworks: AspectJ, JBoss AOP and <b>Spring AOP</b>
+      </article>
+     
+      <article class="smaller">
+          <h3>
+            Simple example - Annotations
+         </h3>
+<pre>
+  public class Foo {
+
+        public void doSomething() {
+                System.out.println("Foo is doing something");
+        }
+  }
+
+  @Aspect
+  public class Logger {
+
+        @Pointcut("execution(* com.example.Foo.doSomething(..))")
+        public void something() {
+                //Dummy method!
+        }
+
+        @Before("something()") //could also use @After, etc.
+        public void logBefore() {
+                System.out.println("Logger is logging before");
+        }
+  }
+
+&lt;aop:aspectj-autoproxy /&gt;
+
+&lt;bean id=&quot;foo&quot;
+    class=&quot;com.example.Foo&quot; /&gt;
+
+&lt;bean id=&quot;logging&quot;
+    class=&quot;com.example.Logger&quot; /&gt;
+
+</pre>
+        </article>
+
+       <article>
+        <h3>
+          AOP terminology
+        </h3>
+            <ul>
+              <li>
+               <span class='blue'>Aspect</span>
+              <li>
+               <span class='blue'>Advice</span> - what and when
+              <li>
+               <span class='blue'>Pointcuts</span> - where
+              <li>
+               <span class='blue'>Join points</span> - set of all possible pointcuts
+              <li>
+               <span class='blue'>Weaving</span> - compile time (AspectJ), classload time (AspectJ 5 LTW), runtime (Spring).
+              <li>
+               <span class='blue'>Introduction</span>
+          </ul>
+        </article>
+
+        <article class="smaller">
+         <h3>
+          Simple example - XML
+         </h3>
+<pre>
+  public class Foo {
+
+      public void doSomething() {
+          System.out.println("Foo is doing something");
+      }
+  }
+
+  public class Logger {
+
+      public void logBefore() {
+          System.out.println("Logger is logging before");
+      }
+  }
+
+  &lt;bean id=&quot;foo&quot;
+    class=&quot;com.example.Foo&quot; /&gt;
+
+  &lt;bean id=&quot;logging&quot;
+    class=&quot;com.example.Logger&quot; /&gt;
+
+  &lt;aop:config&gt;
+    &lt;aop:aspect ref=&quot;logging&quot;&gt;
+      &lt;aop:before pointcut=&quot;execution(* com.example.Foo.doSomething(..))&quot;
+       method=&quot;logBefore&quot; /&gt;
+    &lt;/aop:aspect&gt;
+  &lt;/aop:config&gt;
+
+</pre>
+        </article>
+
+        <article>
+         <h3>Spring AOP characteristics</h3>
+         <ul>
+           <li>Performs runtime weaving
+           <pre>
+
+  public static void main(String[] args) {
+      // When next line of code runs, the proxy class 
+      // for weaving in the logging aspect is created as well.
+      ApplicationContext applicationContext = new 
+          ClassPathXmlApplicationContext("application-context.xml");
+      Foo foo = (Foo) applicationContext.getBean("foo");
+      foo.doSomething();
+  }
+           </pre>
+           <li>Only supports method join points. AspectJ also supports constructor and field join points.
+         </ul>  
+      </article>
+ 
+        <article>
+         <h3>
+           Types of advice
+         </h3>
+         <ul>
+            <li>
+               <span class='red'>Before</span>
+             <li>
+               <span class='green'>After</span>
+             <li>
+               <span class='green'>After-returning</span>
+             <li>
+               <span class='green'>After-throwing</span>
+             <li>
+               <span class='blue'>Around</span>
+            </ul>
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+          Spring AOP
+        </h3>
+      </article>
+
+    </section>
+
+  </body>
+</html>

@@ -5,7 +5,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 
 @Aspect
-public class LogMe {
+public class Logger {
 	
 	@Pointcut("execution(* com.example.Foo.doSomething(..))")
 	public void something() {
@@ -14,6 +14,6 @@ public class LogMe {
 	
 	@Before("something()")
 	public void logBefore() {
-		System.out.println("LogMe is logging before");
+		System.out.println("Logger is logging before");
 	}
 }

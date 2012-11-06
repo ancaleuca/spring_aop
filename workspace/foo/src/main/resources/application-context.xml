@@ -13,6 +13,6 @@
     class="com.example.Foo" />
 	
   <bean id="logging"
-    class="com.example.LogMe" />
+    class="com.example.Logger" />
   
 </beans>
