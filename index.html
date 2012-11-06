@@ -204,7 +204,7 @@ Logger is logging around (before)
 Foo is doing something
 Logger is logging around (after)
 </pre>
-<p><b>Peculiarities</b>: if call to <pre>joinPoint.proceed();</pre> </p>
+<p><b>Peculiarities</b>. If call to <pre>joinPoint.proceed();</pre> </p>
 <ul>
  <li> is missing:
 <pre>
@@ -249,7 +249,8 @@ Logger is logging around (after)
   <h3>Passing parameters to advice (2)</h3>
 <pre>
   public static void main(String[] args) {
-      ApplicationContext applicationContext = new ClassPathXmlApplicationContext("application-context.xml");
+      ApplicationContext applicationContext = new 
+           ClassPathXmlApplicationContext("application-context.xml");
       IBasic foo = (IBasic) applicationContext.getBean("foo");
       foo.doSomethingWithParameter("MyParam");
   }
@@ -290,8 +291,25 @@ Logger is logging this parameter: MyParam
      AOP Introductions (2)
    </h3>
 <pre>
+&lt;aop:config&gt;    
+  &lt;aop:aspect&gt;
+    &lt;aop:declare-parents
+      types-matching=&quot;com.example.Foo+&quot;
+      implement-interface=&quot;com.example.IExtra&quot;
+      default-impl=&quot;com.example.ExtraFoo&quot; 
+    /&gt;
+  &lt;/aop:aspect&gt;
+&lt;/aop:config&gt;</pre>
+   </article>
+
+<article class="smaller">
+   <h3>
+     AOP Introductions (3)
+   </h3>
+<pre>
   public static void main(String[] args) {
-      ApplicationContext applicationContext = new ClassPathXmlApplicationContext("application-context.xml");
+      ApplicationContext applicationContext = new 
+          ClassPathXmlApplicationContext("application-context.xml");
       IBasic foo = (IBasic) applicationContext.getBean("foo");
       IExtra extraFoo = (IExtra) foo;
 		
@@ -302,6 +320,7 @@ Logger is logging this parameter: MyParam
       System.out.println("##### This is IExtra: ######");
       extraFoo.doSomethingExtra();
   }
+
 Console output:
 Is IBasic?: true
 Is IExtra?: true
